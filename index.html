@@ -1,0 +1,137 @@
+<html>
+	<head>
+		<style>
+			.error_log{
+				color: #ff0000;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="tanks">
+		  Tank A: <select id="shooters"></select>
+		  Tank B: <select id="targets"></select>
+		  <button onclick="do_fire()">Fire!</button>
+		  <button onclick="print_game('this is a test')">test!</button>
+		</div>
+
+		<div id="gameBoard">
+
+		</div>
+		
+		<script>
+			var step = 0;
+			var tanks=[];
+			
+			function getTankByName(tankName){
+				var elm;
+				Array.from(tanks).forEach(function(element) {
+					if(element.name==tankName){
+						elm =  element;
+					}
+				});
+				return elm;
+			}
+
+			function do_fire(){
+				var shooters = document.getElementById('shooters');
+				var targets = document.getElementById('targets');
+				
+				shooter = shooters.options[shooters.selectedIndex].value;
+				target = targets.options[targets.selectedIndex].value;
+				if(shooter == target) {
+					print_game(shooter + " can not shoot at himself","error_log");
+					return;
+				}
+				
+				print_game(shooter + " is shooting on " + target);
+				selectedTank = getTankByName(shooter);
+				selectedTank.hit(getTankByName(target))
+			}
+
+			function print_game(txt,className){
+				 document.querySelector("#gameBoard").innerHTML += step + ": <span class='" + className + "'> " +  txt + "</span><br/>";
+			   step++;
+			}
+
+			class Tank {
+			  constructor(name) {
+				this.name = name;
+				this.life = 5;
+				this.shell = 3;
+				
+				
+			   print_game("New tank in the game: " + this.name + " [" + this.life + "," + this.shell + "]");
+			   document.querySelector("#shooters").innerHTML  +="<option value='" + this.name + "'>" + this.name +"</option>";
+			   
+				document.querySelector("#targets").innerHTML  +="<option value='" + this.name + "'>" + this.name +"</option>";
+			    tanks.push(this);
+			  }
+			  
+			  
+
+			  get name() {
+				return this._name;
+			  }
+			  
+			  get life() {
+				return this._life;
+			  }
+
+			  get shell() {
+				return this._shell;
+			  }
+			  
+			  hit(hitBy){
+				if(hitBy.shell > 0) {
+				  if(this.life == 0){
+				  print_game("You can not shoot " + this.name + ", he is dead");
+				  return;
+				  }
+				  this.life = this.life - 1;  
+				  if(this._life==0) {
+					print_game(this.name + " is dead");
+				  } else {
+					print_game(this.name + " has been hit by " + hitBy.name + " and now have " + this.life + " life");
+				  }
+				  hitBy.shell--;
+				} else {
+					print_game(hitBy.name + " can not shoot, he have no shells")
+				}
+			  } 
+			  set life(value) {
+				this._life = value;
+				
+			  }
+			   set shell(value) {
+				if(this._shell<1) {
+					alert(this.name + " has no armor");
+				} else {
+					this._shell = value;
+				}
+			  }
+			  set name(value) {
+				if (value.length < 3) {
+				  alert("Name is too short.");
+				  return;
+				}
+				this._name = value;
+			  }
+
+			}
+
+			let Alice =  new Tank("Alice")
+			let Bob =  new Tank("Bob")
+			let Charlie =  new Tank("Charlie")
+			let Roee =  new Tank("Roee")
+/*
+
+			Bob.hit(Alice);
+			Bob.hit(Alice);
+			Bob.hit(Alice);
+			Bob.hit(Alice);
+			Bob.hit(Charlie);
+			Bob.hit(Charlie);
+			*/
+		</script>
+	</body>
+</html>
